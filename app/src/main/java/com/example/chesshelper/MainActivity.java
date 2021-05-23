@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity
 {
 
     private Button pictureButton;
+    private Button bluetoothButton;
     public static final int REQUEST_PERMISSION = 300;
     public static final int REQUEST_IMAGE = 100;
     private String model;
@@ -69,11 +70,19 @@ public class MainActivity extends AppCompatActivity
         }
 
         pictureButton = (Button)findViewById(R.id.captureImageButtonId);
+        bluetoothButton = (Button)findViewById(R.id.bluetoothGoButton);
         pictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 model = "detect.tflite";
                 openCamera();
+            }
+        });
+        bluetoothButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivity.this, BluetoothActivity.class);
+                startActivity(i);
             }
         });
     }
