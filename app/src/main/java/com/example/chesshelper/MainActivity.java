@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity
         pictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                model = "detect.tflite";
+                model = "chess_model.tflite";
                 openCamera();
             }
         });
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity
         {
             if (!(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED))
             {
-                Toast.makeText(getApplicationContext(), "This application needs read, write and camera permissions to run. Application closing.", Toast.LENGTH_LONG);
+                Toast.makeText(getApplicationContext(), "This application needs read, write, camera and bluetooth permissions.", Toast.LENGTH_LONG);
                 System.exit(0);
             }
         }

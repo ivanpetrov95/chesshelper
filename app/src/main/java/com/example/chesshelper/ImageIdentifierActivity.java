@@ -33,7 +33,7 @@ import java.util.PriorityQueue;
 
 public class ImageIdentifierActivity extends AppCompatActivity {
 
-    private static final int RESULTS_NUMBER = 3;
+    private static final int RESULTS_NUMBER = 1;
     private static final int IMAGE_MEAN = 128;
     private static final float IMAGE_STD = 128.0f;
     private final Interpreter.Options tensorflowLiteOptions = new Interpreter.Options();
@@ -44,19 +44,16 @@ public class ImageIdentifierActivity extends AppCompatActivity {
     private String[] topLabels = null;
     private String[] topConfidence = null;
     private String model;
-    private int IMG_SIZE_X = 640;
-    private int IMG_SIZE_Y = 640;
+    private int IMG_SIZE_X = 224;
+    private int IMG_SIZE_Y = 224;
     private int PIXEL_SIZE = 3;
     private int[] intValues;
     private ImageView cameraCapturedImage;
     private Button classifyButton;
+    private Button infoButton;
     private Button backButton;
     private TextView labelOne;
-    private TextView labelTwo;
-    private TextView labelThree;
     private TextView confidenceOne;
-    private TextView confidenceTwo;
-    private TextView confidenceThree;
 
     private PriorityQueue<Map.Entry<String, Float>> sortedLabels =
             new PriorityQueue<>(
@@ -83,23 +80,20 @@ public class ImageIdentifierActivity extends AppCompatActivity {
         {
             exception.printStackTrace();
         }
-        imageData = ByteBuffer.allocateDirect(IMG_SIZE_X * IMG_SIZE_Y * PIXEL_SIZE);
+        imageData = ByteBuffer.allocateDirect(4 * IMG_SIZE_X * IMG_SIZE_Y * PIXEL_SIZE);
         imageData.order(ByteOrder.nativeOrder());
         labelProbabilityArray = new float[1][labelList.size()];
 
         setContentView(R.layout.activity_image_identifier);
-
-        labelOne = findViewById(R.id.labelOne);
-        labelTwo = findViewById(R.id.labelTwo);
-        labelThree = findViewById(R.id.labelThree);
-        confidenceOne = findViewById(R.id.confidenceOne);
-        confidenceTwo = findViewById(R.id.confidenceTwo);
-        confidenceThree = findViewById(R.id.confidenceThree);
-        cameraCapturedImage = findViewById(R.id.capturedImageView);
         topLabels = new String[RESULTS_NUMBER];
         topConfidence = new String[RESULTS_NUMBER];
-        backButton = findViewById(R.id.backButton);
+
+        labelOne = findViewById(R.id.labelOne);
+        confidenceOne = findViewById(R.id.confidenceOne);
+        cameraCapturedImage = findViewById(R.id.capturedImageView);
         classifyButton = findViewById(R.id.classifyButton);
+        infoButton = findViewById(R.id.infoButton);
+        backButton = findViewById(R.id.backButton);
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,8 +111,19 @@ public class ImageIdentifierActivity extends AppCompatActivity {
                 convertBitmapToByteBuffer(bitmap);
                 tensorflowLite.run(imageData, labelProbabilityArray);
                 printTopLabels();
+                infoButton.setEnabled(true);
             }
         });
+
+        infoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent bluetoothIntent = new Intent(ImageIdentifierActivity.this, BluetoothActivity.class);
+                bluetoothIntent.putExtra("figureData", topLabels[0]);
+                startActivity(bluetoothIntent);
+            }
+        });
+
 
         Uri uri = getIntent().getParcelableExtra("resID_uri");
         try
@@ -152,12 +157,8 @@ public class ImageIdentifierActivity extends AppCompatActivity {
             topConfidence[i] = String.format("%.0f%%", label.getValue()*100);
         }
 
-        labelOne.setText("1. "+topLabels[2]);
-        labelTwo.setText("2. "+topLabels[1]);
-        labelThree.setText("3. "+topLabels[0]);
-        confidenceOne.setText(topConfidence[2]);
-        confidenceTwo.setText(topConfidence[1]);
-        confidenceThree.setText(topConfidence[0]);
+        labelOne.setText("1. "+topLabels[0]);
+        confidenceOne.setText(topConfidence[0]);
     }
 
     private void convertBitmapToByteBuffer(Bitmap bitmap)
@@ -196,7 +197,7 @@ public class ImageIdentifierActivity extends AppCompatActivity {
     private List<String> loadLabelList() throws IOException
     {
         List<String> labelList = new ArrayList<String>();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(this.getAssets().open("labelMap.txt")));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(this.getAssets().open("label_map.txt")));
         String line;
         while ((line = reader.readLine()) != null)
         {
