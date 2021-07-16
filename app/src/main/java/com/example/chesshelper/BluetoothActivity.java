@@ -20,7 +20,6 @@ import java.util.UUID;
 public class BluetoothActivity extends AppCompatActivity {
 
     TextToSpeech textToSpeech;
-    Button textToSpeechButton;
     String figureData;
     static final UUID ARDUINO_B_MODULE_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     static final String BLUETOOTH_MODULE_ADDRESS = "98:D3:51:F5:C3:38";
@@ -28,7 +27,6 @@ public class BluetoothActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth2);
-        textToSpeechButton = findViewById(R.id.textToSpeechButton);
         Intent receivingIntent = getIntent();
         figureData = receivingIntent.getStringExtra("figureData");
         textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
@@ -46,7 +44,7 @@ public class BluetoothActivity extends AppCompatActivity {
 
 
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        BluetoothDevice arduinoBluetoothModule = bluetoothAdapter.getRemoteDevice("98:D3:51:F5:C3:38");
+        BluetoothDevice arduinoBluetoothModule = bluetoothAdapter.getRemoteDevice(BLUETOOTH_MODULE_ADDRESS);
         BluetoothSocket bluetoothSocket = null;
         int numberOfTries = 1;
         do {

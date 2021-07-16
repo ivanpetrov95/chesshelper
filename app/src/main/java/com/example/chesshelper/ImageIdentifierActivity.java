@@ -1,5 +1,6 @@
 package com.example.chesshelper;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -10,10 +11,13 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.tensorflow.lite.Interpreter;
 
@@ -136,7 +140,30 @@ public class ImageIdentifierActivity extends AppCompatActivity {
         {
             exception.printStackTrace();
         }
+
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav_image_identifier);
+        bottomNavigationView.setOnNavigationItemSelectedListener(navigationListener);
     }
+
+    private BottomNavigationView.OnNavigationItemSelectedListener navigationListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                    if (menuItem.getItemId() == R.id.identifyImageButtonId)
+                    {
+                        Intent bluetoothIntent = new Intent(ImageIdentifierActivity.this, BluetoothActivity.class);
+                        bluetoothIntent.putExtra("figureData", topLabels[0]);
+                        startActivity(bluetoothIntent);
+                        return true;
+                    }
+                    else
+                    {
+                        Intent i = new Intent(ImageIdentifierActivity.this, MainActivity.class);
+                        startActivity(i);
+                        return true;
+                    }
+                }
+            };
 
     private void printTopLabels()
     {

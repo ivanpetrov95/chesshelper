@@ -23,12 +23,12 @@
         android:id="@+id/infoButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
+        android:layout_marginStart="68dp"
+        android:layout_marginLeft="68dp"
+        android:layout_marginBottom="8dp"
         android:enabled="false"
         android:text="Info"
         app:layout_constraintBottom_toTopOf="@+id/classifyButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.21"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -46,12 +46,11 @@
         android:id="@+id/classifyButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="68dp"
         android:layout_marginBottom="28dp"
         android:text="Classify"
         app:layout_constraintBottom_toTopOf="@+id/labelOne"
         app:layout_constraintEnd_toStartOf="@+id/backButton"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.462"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
@@ -75,4 +74,14 @@
         android:text="TextView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_nav_image_identifier"
+        android:layout_width="256dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/top_rounded_bar_corners"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/image_identify_menu_bar" />
 </androidx.constraintlayout.widget.ConstraintLayout>

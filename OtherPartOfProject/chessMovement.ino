@@ -6,7 +6,7 @@ int outputPinThree = 3;//signal pin for backward
 int pwmPinRightMotor = 6;
 int outputPinFour = 4;//signal pin for forward
 int outputPinFive = 5;//signal pin for backward
-int motorSpeed = 125;
+int motorSpeed = 50;
 int SHORT_DURATION = 1000;
 int MEDIUM_DURATION = 2000;
 int LONG_DURATION = 5000;
@@ -147,7 +147,7 @@ void queenMovement()
 //////////////////////////////////////////////////////
 
 void loop() 
-{ 
+{
   if(Serial.available() > 0)
   {
     receivedData = Serial.read();
