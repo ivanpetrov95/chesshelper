@@ -11,6 +11,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.speech.tts.TextToSpeech;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -32,6 +33,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.PriorityQueue;
 
@@ -58,6 +60,8 @@ public class ImageIdentifierActivity extends AppCompatActivity {
     private Button backButton;
     private TextView labelOne;
     private TextView confidenceOne;
+    private TextToSpeech textToSpeech;
+    private String informationData;
 
     private PriorityQueue<Map.Entry<String, Float>> sortedLabels =
             new PriorityQueue<>(
@@ -73,8 +77,18 @@ public class ImageIdentifierActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         model = (String)getIntent().getStringExtra("model");
+        informationData = (String)getIntent().getStringExtra("informationToBeSpokenSecond");
         intValues = new int[IMG_SIZE_X * IMG_SIZE_Y];
         super.onCreate(savedInstanceState);
+        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    textToSpeech.setLanguage(Locale.ENGLISH);
+                    textToSpeechMethod(informationData);
+                }
+            }
+        });
         try
         {
             tensorflowLite = new Interpreter(loadModelFile(), tensorflowLiteOptions);
@@ -143,6 +157,19 @@ public class ImageIdentifierActivity extends AppCompatActivity {
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav_image_identifier);
         bottomNavigationView.setOnNavigationItemSelectedListener(navigationListener);
+    }
+
+    private void textToSpeechMethod(String textToBeSpoken) {
+        textToSpeech.speak(textToBeSpoken, TextToSpeech.QUEUE_FLUSH, null);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (textToSpeech != null) {
+            textToSpeech.stop();
+            textToSpeech.shutdown();
+        }
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navigationListener =

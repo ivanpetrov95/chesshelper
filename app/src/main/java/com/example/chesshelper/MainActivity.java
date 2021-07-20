@@ -12,14 +12,19 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.speech.tts.TextToSpeech;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -27,6 +32,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
+import java.util.Locale;
+
 public class MainActivity extends AppCompatActivity
 {
 
@@ -35,21 +42,29 @@ public class MainActivity extends AppCompatActivity
     public static final int REQUEST_IMAGE = 100;
     private String model;
     private Uri imageURI;
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.example_menu_bar, menu);
-        return true;
-    }
+    private String[] informationText;
+    private TextToSpeech textToSpeech;
+    private String textToBeSpoken;
 
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        //Toolbar toolbar = findViewById(R.id.toolbarId);
-        //setSupportActionBar(toolbar);
+        StorerClass storerClass = new StorerClass();
+        informationText = storerClass.retrieveInformationText();
+        textToBeSpoken = informationText[0] + informationText[1];
+        Animation blinkAnimation = AnimationUtils.loadAnimation(this, R.anim.blink_anim);
+        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    textToSpeech.setLanguage(Locale.ENGLISH);
+                    textToSpeechMethod(textToBeSpoken);
+                }
+            }
+        });
+        Toolbar toolbar = findViewById(R.id.toolbarId);
+        setSupportActionBar(toolbar);
 
         if(ActivityCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
         {
@@ -67,8 +82,8 @@ public class MainActivity extends AppCompatActivity
         }
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav);
+        bottomNavigationView.startAnimation(blinkAnimation);
         bottomNavigationView.setOnNavigationItemSelectedListener(navigationListener);
-
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navigationListener =
@@ -81,6 +96,19 @@ public class MainActivity extends AppCompatActivity
                 }
             };
 
+
+    private void textToSpeechMethod(String textToBeSpoken) {
+        textToSpeech.speak(textToBeSpoken, TextToSpeech.QUEUE_FLUSH, null);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (textToSpeech != null) {
+            textToSpeech.stop();
+            textToSpeech.shutdown();
+        }
+    }
 
     private void openCamera() {
         ContentValues contentValues = new ContentValues();
@@ -130,6 +158,7 @@ public class MainActivity extends AppCompatActivity
             Intent i = new Intent(MainActivity.this, ImageIdentifierActivity.class);
             i.putExtra("resID_uri", imageURI);
             i.putExtra("model", model);
+            i.putExtra("informationToBeSpokenSecond", informationText[2]);
             startActivity(i);
         }
     }
